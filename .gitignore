@@ -27,3 +27,5 @@ gradlew.bat
 HELP.md
 .idea/*
 gradle/*
+.gradle/*
+out/*
