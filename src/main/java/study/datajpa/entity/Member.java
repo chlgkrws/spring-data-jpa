@@ -12,6 +12,7 @@ import javax.persistence.*;
 @NamedQuery(name = "Member.findByUsername",
         query = "select m from Member m where m.username = :username"
 )
+@NamedEntityGraph(name = "Member.All", attributeNodes = @NamedAttributeNode("team"))
 public class Member {
 
     @Id

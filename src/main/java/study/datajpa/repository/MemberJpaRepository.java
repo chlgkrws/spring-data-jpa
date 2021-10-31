@@ -1,6 +1,7 @@
 package study.datajpa.repository;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.web.servlet.mvc.Controller;
 import study.datajpa.entity.Member;
 
 import javax.persistence.EntityManager;
@@ -60,6 +61,31 @@ public class MemberJpaRepository {
                 .setParameter("username", username)
                 .getResultList();
 
+    }
+
+    public List<Member> findByPage(int age, int offset, int limit) {
+        var memberList = em.createQuery("select m from Member m where m.age = :age order by m.username desc")
+                .setParameter("age", age)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+        return memberList;
+    }
+
+    public Long totalCount(int age) {
+            return em.createQuery("select count(m) from Member m where m.age = :age", Long.class)
+                .setParameter("age",age)
+                .getSingleResult();
+
+    }
+
+    public int bulkAgePlus(int age) {
+        int resultCount = em.createQuery("update Member m set m.age = m.age+1" +
+                        "where m.age =:age")
+                .setParameter("age", age)
+                .executeUpdate();
+
+        return resultCount;
     }
 
 

@@ -8,6 +8,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.entity.Member;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -20,6 +22,9 @@ class MemberJpaRepositoryTest {
 
     @Autowired
     MemberJpaRepository memberJpaRepository;
+
+    @PersistenceContext
+    EntityManager entityManager;
 
     @Test
     public void testMember() throws Exception {
@@ -94,6 +99,56 @@ class MemberJpaRepositoryTest {
     }
 
 
+    @Test
+    public void paging() {
+        //given - 이런 데이터가 있을 떄
+        // when - 이렇게 하면
+        // then - 이렇게 된다.
+        memberJpaRepository.save(new Member("member1", 10));
+        memberJpaRepository.save(new Member("member2", 10));
+        memberJpaRepository.save(new Member("member3", 10));
+        memberJpaRepository.save(new Member("member4", 10));
+        memberJpaRepository.save(new Member("member5", 10));
+        memberJpaRepository.save(new Member("member6", 10));
+
+        int age = 10;
+        int offset = 0;
+        int limit = 3;
+
+        //when
+        List<Member> members = memberJpaRepository.findByPage(10, 0, 3);
+        Long aLong = memberJpaRepository.totalCount(10);
+
+        assertThat(members.size()).isEqualTo(3);
+        assertThat(aLong).isEqualTo(6L);
+    }
+
+    @Test
+    public void bulkUpdate() throws Exception {
+        // given
+        memberJpaRepository.save(new Member("AA", 10, null));
+        memberJpaRepository.save(new Member("AA1", 10, null));
+        memberJpaRepository.save(new Member("AA2", 10, null));
+        memberJpaRepository.save(new Member("AA3", 10, null));
+        memberJpaRepository.save(new Member("AA4", 10, null));
+        memberJpaRepository.save(new Member("AA5", 10, null));
+        memberJpaRepository.save(new Member("AA7", 10, null));
+        memberJpaRepository.save(new Member("AA6", 10, null));
+
+        int resultCount = memberJpaRepository.bulkAgePlus(10);
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Member> aa6 = memberJpaRepository.findByUsername("AA6");
+        System.out.println("aa6 = " + aa6.get(0).getAge());
+
+        assertThat(resultCount).isEqualTo(8);
+
+
+        // when
+
+        // then
+    }
 
 
 
