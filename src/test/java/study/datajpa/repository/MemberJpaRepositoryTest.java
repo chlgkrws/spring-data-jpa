@@ -144,12 +144,26 @@ class MemberJpaRepositoryTest {
 
         assertThat(resultCount).isEqualTo(8);
 
-
-        // when
-
-        // then
     }
 
+    @Test
+    public void emGetClass() throws Exception {
+        System.out.println(entityManager);
+        memberJpaRepository.save(new Member("user"));
+        entityManager.flush();
+        entityManager.clear();
+        System.out.println(entityManager);
+    }
+
+    @Test
+    public void queryHint() {
+        //given
+        Member member = new Member("user", 10);
+        memberJpaRepository.save(member);
+        entityManager.flush();
+        entityManager.clear();
+
+    }
 
 
 }
