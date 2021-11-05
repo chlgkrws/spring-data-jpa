@@ -338,7 +338,12 @@ public class MemberRepositoryTest {
 
         //when
         List<Member> lockByUsername = memberRepository.findLockByUsername("user");
-
     }
+
+    @Test
+    public void customInterface() {
+        List<Member> memberCustom = memberRepository.findMemberCustom();
+    }
+
 
 }
