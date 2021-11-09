@@ -1,16 +1,13 @@
 package study.datajpa.repository;
 
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
+import study.datajpa.dto.UsernameDto;
 import study.datajpa.entity.Member;
 import study.datajpa.entity.Team;
 
@@ -345,5 +342,58 @@ public class MemberRepositoryTest {
         List<Member> memberCustom = memberRepository.findMemberCustom();
     }
 
+    @Test
+    public void queryByExample() {
+        //given
+        Team teamA = new Team("teamA");
+        entityManager.persist(teamA);
 
+        Member member = new Member("m1", 0, teamA);
+        Member member1 = new Member("m2", 0, teamA);
+        entityManager.persist(member);
+        entityManager.persist(member1);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        // probe
+        Member member2 = new Member("m1");
+        Team team = new Team("teamA");
+        member2.setTeam(team);
+
+        ExampleMatcher matcher = ExampleMatcher.matching().withIgnorePaths("age");
+        Example<Member> of = Example.of(member2,matcher);
+        List<Member> all = memberRepository.findAll(of);
+
+        assertThat(all.get(0).getUsername()).isEqualTo("m1");
+    }
+
+    @Test
+    public void projections() {
+        //given
+        Team teamA = new Team("teamA");
+        entityManager.persist(teamA);
+
+        Member member = new Member("m1", 0, teamA);
+        Member member1 = new Member("m2", 0, teamA);
+        entityManager.persist(member);
+        entityManager.persist(member1);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        //when
+        List<UsernameOnly> result = memberRepository.findProjectionsByUsername("m1");
+
+        for (UsernameOnly usernameOnly : result) {
+            System.out.println("usernameOnly = " + usernameOnly);
+        }
+
+        List<UsernameDto> result2 = memberRepository.findClassProjectionByUsername("m1");
+        for (UsernameDto memberDto : result2) {
+            System.out.println("memberDto.getUsername() = " + memberDto.getUsername());
+
+        }
+    }
 }
